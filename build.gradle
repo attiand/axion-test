@@ -2,3 +2,27 @@ plugins {
     id 'base'
     id 'pl.allegro.tech.build.axion-release' version '1.13.14'
 }
+
+
+scmVersion {
+    branchVersionCreator = [
+        'rel_.*': 'simple',
+        'patch_.*': 'simple',
+        '.*': 'versionWithBranch'
+    ]
+    useHighestVersion = true
+    ignoreUncommittedChanges = false
+    tag {
+        prefix = ''
+    }
+
+    hooks {
+        pre {context -> databaseUpgrade(context.previousVersion, context.currentVersion)}
+    }
+}
+
+
+String databaseUpgrade(def previousVersion, def releaseVersion) {
+    println previousVersion.class
+    println releaseVersion.class
+}
