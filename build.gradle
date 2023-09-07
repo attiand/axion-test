@@ -23,6 +23,5 @@ scmVersion {
 
 
 String databaseUpgrade(def previousVersion, def releaseVersion) {
-    println previousVersion.class
-    println releaseVersion.class
+    println "----- ${previousVersion} ${releaseVersion}"
 }
