@@ -4,7 +4,8 @@ plugins {
 }
 
 import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.treewalk.CanonicalTreeParser
+import org.eclipse.jgit.lib.*
 
 scmVersion {
     branchVersionCreator = [
@@ -28,7 +29,24 @@ String databaseUpgrade(def previousVersion, def releaseVersion) {
     Git git = Git.open(file('.'))
     Repository repository = git.getRepository()
     
-    println repository.getTags()
+    ObjectId p = repository.resolve(previousVersion)
+    ObjectId c = repository.resolve(releaseVersion)
+
+    ObjectReader reader = repository.newObjectReader();
+    CanonicalTreeParser pTreeIter = new CanonicalTreeParser();
+    oldTreeIter.reset(reader, p);
+    CanonicalTreeParser cTreeIter = new CanonicalTreeParser();
+    newTreeIter.reset(reader, c);
+
+    def diffs = git.diff()
+            .setNewTree(cTreeIter)
+            .setOldTree(pTreeIter)
+            .call();
+
+
+    diffs.each { d ->
+        println "Entry: " + entry.getChangeType() + ":" + entry.getNewPath()
+    }
 
     println "----- ${previousVersion} ${releaseVersion}"
 }
