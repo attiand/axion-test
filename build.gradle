@@ -20,7 +20,7 @@ scmVersion {
     }
 
     hooks {
-        post {context -> databaseUpgrade(context.previousVersion, context.currentVersion)}
+        post {context -> file("${buildDir}/upgrade.txt").text = databaseUpgrade(context.previousVersion, context.currentVersion)}
     }
 }
 
@@ -32,7 +32,7 @@ String databaseUpgrade(def previousVersion, def releaseVersion) {
     ObjectId p = repository.resolve(previousVersion + '^{tree}')
     ObjectId c = repository.resolve(releaseVersion + '^{tree}')
 
-    println "Printing diff between tree: " + p + " and " + c
+    logger.debug('analysing diff between tree: {} and {}', p, c)
 
     ObjectReader reader = repository.newObjectReader();
     CanonicalTreeParser pTreeIter = new CanonicalTreeParser();
@@ -40,17 +40,26 @@ String databaseUpgrade(def previousVersion, def releaseVersion) {
     CanonicalTreeParser cTreeIter = new CanonicalTreeParser();
     cTreeIter.reset(reader, c);
 
-
-
     def diffs = git.diff()
             .setNewTree(cTreeIter)
             .setOldTree(pTreeIter)
             .call();
 
-
-    diffs.each { d ->
-        println "Entry: " + d.getChangeType() + ":" + d.getNewPath()
+    def upgrades = diffs.findResults { d ->
+        d.getNewPath().find(~/\/migration\/([^\/]+)/) { _, v ->
+            v
+        }
     }
 
-    println "----- ${previousVersion} ${releaseVersion}"
+    logger.debug('upgrades: {}', upgrades)
+
+    def version = upgrades.unique()
+
+    if(version.size() == 1) {
+        return version.first()
+    }
+    else {
+        logger.error('could not determine upgrade version: {}', version)
+        return []
+    }
 }
