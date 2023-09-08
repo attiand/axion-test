@@ -3,7 +3,8 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.13.14'
 }
 
-import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.Git
+import org.eclipse.jgit.lib.Repository
 
 scmVersion {
     branchVersionCreator = [
@@ -24,7 +25,8 @@ scmVersion {
 
 
 String databaseUpgrade(def previousVersion, def releaseVersion) {
-
- Git git = Git.open(file('.'));
+    Git git = Git.open(file('.'))
+    Repository repository = git.getRepository()
+    
     println "----- ${previousVersion} ${releaseVersion}"
 }
