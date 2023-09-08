@@ -23,5 +23,7 @@ scmVersion {
 
 
 String databaseUpgrade(def previousVersion, def releaseVersion) {
+
+     println grgit.describe()
     println "----- ${previousVersion} ${releaseVersion}"
 }
