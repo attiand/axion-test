@@ -46,7 +46,7 @@ String databaseUpgrade(def previousVersion, def releaseVersion) {
             .call();
 
     def upgrades = diffs.findResults { d ->
-        d.getNewPath().find(~/\/migration\/([^\/]+)/) { _, v ->
+        d.getNewPath().find(~/\/migration\/(V[^\/]+)/) { _, v ->
             v
         }
     }
