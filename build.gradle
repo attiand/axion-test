@@ -49,7 +49,7 @@ String databaseUpgrade(def previousVersion, def releaseVersion) {
 
 
     diffs.each { d ->
-        println "Entry: " + entry.getChangeType() + ":" + entry.getNewPath()
+        println "Entry: " + d.getChangeType() + ":" + d.getNewPath()
     }
 
     println "----- ${previousVersion} ${releaseVersion}"
