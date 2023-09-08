@@ -20,7 +20,7 @@ scmVersion {
     }
 
     hooks {
-        pre {context -> databaseUpgrade(context.previousVersion, context.currentVersion)}
+        post {context -> databaseUpgrade(context.previousVersion, context.currentVersion)}
     }
 }
 
