@@ -28,5 +28,7 @@ String databaseUpgrade(def previousVersion, def releaseVersion) {
     Git git = Git.open(file('.'))
     Repository repository = git.getRepository()
     
+    println repository.getTags()
+
     println "----- ${previousVersion} ${releaseVersion}"
 }
