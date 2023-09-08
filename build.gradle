@@ -32,11 +32,15 @@ String databaseUpgrade(def previousVersion, def releaseVersion) {
     ObjectId p = repository.resolve(previousVersion + '^{tree}')
     ObjectId c = repository.resolve(releaseVersion + '^{tree}')
 
+    println "Printing diff between tree: " + p + " and " + c
+
     ObjectReader reader = repository.newObjectReader();
     CanonicalTreeParser pTreeIter = new CanonicalTreeParser();
     pTreeIter.reset(reader, p);
     CanonicalTreeParser cTreeIter = new CanonicalTreeParser();
-    newTreeIter.reset(reader, c);
+    cTreeIter.reset(reader, c);
+
+
 
     def diffs = git.diff()
             .setNewTree(cTreeIter)
