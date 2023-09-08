@@ -29,14 +29,14 @@ String databaseUpgrade(def previousVersion, def releaseVersion) {
     Git git = Git.open(file('.'))
     Repository repository = git.getRepository()
     
-    ObjectId p = repository.resolve(previousVersion)
-    ObjectId c = repository.resolve(releaseVersion)
+    ObjectId p = repository.resolve(previousVersion + '^{tree}')
+    ObjectId c = repository.resolve(releaseVersion + '^{tree}')
 
     ObjectReader reader = repository.newObjectReader();
     CanonicalTreeParser pTreeIter = new CanonicalTreeParser();
     pTreeIter.reset(reader, p);
     CanonicalTreeParser cTreeIter = new CanonicalTreeParser();
-    cTreeIter.reset(reader, c);
+    newTreeIter.reset(reader, c);
 
     def diffs = git.diff()
             .setNewTree(cTreeIter)
