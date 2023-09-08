@@ -34,9 +34,9 @@ String databaseUpgrade(def previousVersion, def releaseVersion) {
 
     ObjectReader reader = repository.newObjectReader();
     CanonicalTreeParser pTreeIter = new CanonicalTreeParser();
-    oldTreeIter.reset(reader, p);
+    pTreeIter.reset(reader, p);
     CanonicalTreeParser cTreeIter = new CanonicalTreeParser();
-    newTreeIter.reset(reader, c);
+    cTreeIter.reset(reader, c);
 
     def diffs = git.diff()
             .setNewTree(cTreeIter)
