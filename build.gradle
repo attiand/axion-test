@@ -3,9 +3,7 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.13.14'
 }
 
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.treewalk.CanonicalTreeParser
-import org.eclipse.jgit.lib.*
+import se.uhr.nya.db.DatabaseVersion
 
 scmVersion {
     branchVersionCreator = [
@@ -20,46 +18,25 @@ scmVersion {
     }
 
     hooks {
-        post {context -> file("${buildDir}/upgrade.txt").text = databaseUpgrade(context.previousVersion, context.currentVersion)}
+        post {context -> file("${buildDir}/upgrade.txt").text = databaseVersions(context.previousVersion, context.currentVersion)}
     }
 }
 
 
-String databaseUpgrade(def previousVersion, def releaseVersion) {
-    Git git = Git.open(file('.'))
-    Repository repository = git.getRepository()
-    
-    ObjectId p = repository.resolve(previousVersion + '^{tree}')
-    ObjectId c = repository.resolve(releaseVersion + '^{tree}')
+String databaseVersions(def previousVersion, def releaseVersion) {
+    DatabaseVersion db = new DatabaseVersion(file('.'))
 
-    logger.debug('analysing diff between tree: {} and {}', p, c)
+    def versions = db.versions(previousVersion, releaseVersion).unique()
 
-    ObjectReader reader = repository.newObjectReader();
-    CanonicalTreeParser pTreeIter = new CanonicalTreeParser();
-    pTreeIter.reset(reader, p);
-    CanonicalTreeParser cTreeIter = new CanonicalTreeParser();
-    cTreeIter.reset(reader, c);
-
-    def diffs = git.diff()
-            .setNewTree(cTreeIter)
-            .setOldTree(pTreeIter)
-            .call();
-
-    def upgrades = diffs.findResults { d ->
-        d.getNewPath().find(~/\/migration\/(V[^\/]+)/) { _, v ->
-            v
-        }
+    if(versions.size() == 1) {
+        logger.debug('upgrade to version: {}', versions.first())
+        return versions.first()
     }
-
-    logger.debug('upgrades: {}', upgrades)
-
-    def version = upgrades.unique()
-
-    if(version.size() == 1) {
-        return version.first()
+    else if(versions.size() > 1) {
+        logger.error('no distinct version: {}', versions)
+        return ''
     }
     else {
-        logger.error('could not determine upgrade version: {}', version)
-        return []
+        return ''
     }
 }
