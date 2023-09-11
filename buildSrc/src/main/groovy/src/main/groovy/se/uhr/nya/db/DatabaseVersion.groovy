@@ -36,7 +36,7 @@ class DatabaseVersion {
 
     public List<String> versions(def previousVersion, def releaseVersion) {
         def upgrades = newPaths(previousVersion, releaseVersion).findResults { p ->
-            p.getNewPath().find(~/\/migration\/(V[^\/]+)/) { _, v ->
+            p.find(~/\/migration\/(V[^\/]+)/) { _, v ->
                 v
             }
         }
