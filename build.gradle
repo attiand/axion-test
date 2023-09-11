@@ -1,7 +1,8 @@
 plugins {
-    id 'base'
     id 'pl.allegro.tech.build.axion-release' version '1.13.14'
 }
+
+apply plugin: 'java-library'
 
 import se.uhr.nya.db.DatabaseVersion
 
