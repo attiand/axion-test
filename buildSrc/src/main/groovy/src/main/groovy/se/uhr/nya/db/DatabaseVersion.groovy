@@ -10,7 +10,7 @@ class DatabaseVersion {
 
     public DatabaseVersion(File gitRepoRoot) {
         Git git = Git.open(gitRepoRoot)
-        Repository repository = git.getRepository()
+        repository = git.getRepository()
     }
 
     public List<String> newPaths(def previousVersion, def releaseVersion) {
