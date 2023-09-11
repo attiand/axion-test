@@ -6,14 +6,15 @@ import org.eclipse.jgit.lib.*
 
 class DatabaseVersion {
 
-    private final Repository repository
+    private final Git git
 
     public DatabaseVersion(File gitRepoRoot) {
-        Git git = Git.open(gitRepoRoot)
-        repository = git.getRepository()
+        git = Git.open(gitRepoRoot)
     }
 
     public List<String> newPaths(def previousVersion, def releaseVersion) {
+        def repository = git.getRepository()
+
         ObjectId p = repository.resolve(previousVersion + '^{tree}')
         ObjectId c = repository.resolve(releaseVersion + '^{tree}')
 
