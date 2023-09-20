@@ -17,7 +17,7 @@ scmVersion {
     }
 
     hooks {
-        post {context -> file("${buildDir}/upgrade.txt").text = databaseVersions(context.previousVersion, context.currentVersion)}
+        post {context -> layout.buildDirectory.file('upgrade.txt').text = databaseVersions(context.previousVersion, context.currentVersion)}
     }
 }
 
