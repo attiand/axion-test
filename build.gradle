@@ -18,7 +18,10 @@ scmVersion {
     }
 
     hooks {
-        post {context -> layout.buildDirectory.file('upgrade.txt').get().getAsFile().createParentDirectories().text = databaseVersions(context.previousVersion, context.currentVersion)}
+        post { context ->
+            layout.buildDirectory.dir().get().getAsFile().mkdirs()
+            layout.buildDirectory.file('upgrade.txt').get().getAsFile().createParentDirectories().text = databaseVersions(context.previousVersion, context.currentVersion)
+        }
     }
 }
 
