@@ -1,4 +1,5 @@
 plugins {
+    id 'base'
     id 'pl.allegro.tech.build.axion-release' version '1.13.14'
 }
 
@@ -17,7 +18,7 @@ scmVersion {
     }
 
     hooks {
-        post {context -> layout.buildDirectory.file('upgrade.txt').get().getAsFile().text = databaseVersions(context.previousVersion, context.currentVersion)}
+        post {context -> layout.buildDirectory.file('upgrade.txt').get().getAsFile().createParentDirectories().text = databaseVersions(context.previousVersion, context.currentVersion)}
     }
 }
 
