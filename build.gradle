@@ -43,3 +43,13 @@ String databaseVersions(def previousVersion, def releaseVersion) {
         return ''
     }
 }
+
+tasks.register('verifyUpgrade') {
+    doLast {
+
+println "----------- ${scmVersion.previousVersion}"
+
+        String dbVersion = databaseVersions(scmVersion.previousVersion, 'HEAD')
+        logger.info("-------------------------" + dbVersion)
+    }
+}

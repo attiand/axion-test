@@ -18,6 +18,9 @@ class DatabaseVersion {
         ObjectId p = repository.resolve(previousVersion + '^{tree}')
         ObjectId c = repository.resolve(releaseVersion + '^{tree}')
 
+
+        println "==================== prev ${p}, current ${c}"
+
         ObjectReader reader = repository.newObjectReader()
         CanonicalTreeParser pTreeIter = new CanonicalTreeParser()
         pTreeIter.reset(reader, p);
