@@ -1,0 +1,3 @@
+--#SET TERMINATOR @
+
+-- CALL SYSPROC.ADMIN_CMD('update db cfg using AUTO_REVAL DEFERRED') @

@@ -3,7 +3,7 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.13.14'
 }
 
-import se.uhr.nya.db.DatabaseVersion
+import se.uhr.nya.db.DatabaseModel
 
 scmVersion {
     branchVersionCreator = [
@@ -20,36 +20,43 @@ scmVersion {
     hooks {
         post { context ->
             getBuildDir().mkdirs()
-            new File(getBuildDir(), 'upgrade.txt').text = databaseVersions(context.previousVersion, context.currentVersion)
+            new File(getBuildDir(), 'upgrade.txt').text = databaseMigrations(context.previousVersion, context.currentVersion)
         }
     }
 }
 
 
-String databaseVersions(def previousVersion, def releaseVersion) {
-    DatabaseVersion db = new DatabaseVersion(file('.'))
+String databaseMigrations(def previousVersion, def releaseVersion) {
+    DatabaseModel model = new DatabaseModel(file('.'))
 
-    def versions = db.versions(previousVersion, releaseVersion).unique()
+    def migrations = model.migrations(previousVersion, releaseVersion).unique()
 
-    if(versions.size() == 1) {
-        logger.debug('upgrade to version: {}', versions.first())
-        return versions.first()
+    if(migrations.size() == 1) {
+        logger.debug('upgrade to version: {}', migrations.first())
+        return migrations.first()
     }
-    else if(versions.size() > 1) {
-        logger.error('no distinct version: {}', versions)
-        return ''
+    else if(migrations.size() > 1) {
+        logger.error('no distinct version: {}', migrations)
+        return migrations
     }
     else {
-        return ''
+        return '-'
     }
 }
 
 tasks.register('verifyUpgrade') {
     doLast {
+        DatabaseModel model = new DatabaseModel(file('.'))
+        def newVersion = project.findProperty('verifyNewVersion')
 
-println "----------- ${scmVersion.previousVersion}"
+        def migrations = (newVersion ? model.migrations(scmVersion.previousVersion, newVersion) : model.migrations(scmVersion.previousVersion))
 
-        String dbVersion = databaseVersions(scmVersion.previousVersion, 'HEAD')
-        logger.info("-------------------------" + dbVersion)
+        def deliveryNumber = migrations.collect { m ->
+            m.split(/\./).dropRight(1).join('.')
+        }.toUnique().size()
+
+        if(deliveryNumber > 1) {
+            throw new GradleException("There are more than one delivery version upgrade between ${scmVersion.previousVersion} and ${newVersion ?: 'workspace'}: ${migrations.toUnique()}")
+        }
     }
 }
